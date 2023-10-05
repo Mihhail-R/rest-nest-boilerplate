@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { compare, hash } from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -11,23 +12,50 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
-  create(createUserDto: CreateUserDto) {
+  async create(input: CreateUserDto): Promise<Omit<User, 'password'>> {
     const user = new User();
-    user.name = createUserDto.name;
-    user.email = createUserDto.email;
-    user.password = createUserDto.password;
-    return this.usersRepository.save(user);
+    user.name = input.name;
+    user.email = input.email;
+    user.password = input.password;
+    const newUser = await this.usersRepository.save(user);
+    return {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+    };
   }
 
-  findAll() {
+  findAll(): Promise<Omit<User[], 'password'>> {
     return this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    return this.usersRepository.findOne({ where: { id } });
+  findOne(id: number): Promise<Omit<User, 'password'>> {
+    return this.usersRepository.findOne({
+      where: { id },
+      select: ['id', 'name', 'email'],
+    });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  findByEmail(email: string): Promise<Omit<User, 'password'>> {
+    return this.usersRepository.findOne({
+      where: { email },
+      select: ['id', 'name', 'email'],
+    });
+  }
+
+  getUserPasswordHash(
+    id: number,
+  ): Promise<Omit<User, 'name' | 'email' | 'id'>> {
+    return this.usersRepository.findOne({
+      where: { id },
+      select: ['password'],
+    });
+  }
+
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Omit<User, 'password'>> {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -50,5 +78,18 @@ export class UsersService {
 
   remove(id: number) {
     return this.usersRepository.delete({ id });
+  }
+
+  async validatePassword(
+    plainTextPassword: string,
+    user: Omit<User, 'password'>,
+  ) {
+    const hashedPassword = await this.getUserPasswordHash(user.id);
+
+    return await compare(plainTextPassword, hashedPassword.password);
+  }
+
+  async hashPassword(password: string) {
+    return await hash(password, 10);
   }
 }

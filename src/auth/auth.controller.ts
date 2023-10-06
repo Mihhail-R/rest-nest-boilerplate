@@ -1,46 +1,41 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
-  HttpException,
   Post,
   Request,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
 import RegisterDto from './dto/register.dto';
 import { LocalAuthGuard } from './local.auth.guard';
 import { User } from '../users/entities/user.entity';
+import { AuthService } from './auth.service';
+import { Request as Req } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @UseInterceptors(ClassSerializerInterceptor)
   async register(@Body() input: RegisterDto) {
-    if (!input.name || !input.email || !input.password) {
-      throw new HttpException('Missing input', 400);
-    }
-
-    const userWithEmail = await this.usersService.findByEmail(input.email);
-
-    if (userWithEmail) {
-      throw new HttpException('Email is already in use', 400);
-    }
-
-    input.password = await this.usersService.hashPassword(input.password);
-
-    return this.usersService.create(input);
+    return this.authService.registerUser(input);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req): Promise<Omit<User, 'password'>> {
-    return req.user;
+  async login(@Request() req: Req): Promise<Express.User> {
+    return req.user as User;
   }
 
   @Post('logout')
-  async logout(@Request() req): Promise<{ msg: string }> {
-    req.session.destroy();
+  async logout(@Request() req: Req): Promise<{ msg: string }> {
+    req.session.destroy((err) => {
+      if (err) {
+        return { msg: 'Failed to destroy session' };
+      }
+    });
 
     return { msg: 'Session ended' };
   }

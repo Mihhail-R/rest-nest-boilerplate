@@ -908,6 +908,13 @@
     "@types/connect" "*"
     "@types/node" "*"
 
+"@types/compression@^1.7.3":
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/@types/compression/-/compression-1.7.3.tgz#2dd34648fc3b71c95aacd63b3098b2192da33929"
+  integrity sha512-rKquEGjebqizyHNMOpaE/4FdYR5VQiWFeesqYfvJU0seSEyB4625UGhNOO/qIkH10S3wftiV7oefc8WdLZ/gCQ==
+  dependencies:
+    "@types/express" "*"
+
 "@types/connect@*":
   version "3.4.36"
   resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.36.tgz#e511558c15a39cb29bd5357eebb57bd1459cd1ab"

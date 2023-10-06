@@ -26,7 +26,9 @@ export class UsersService {
   }
 
   findAll(): Promise<Omit<User[], 'password'>> {
-    return this.usersRepository.find();
+    return this.usersRepository.find({
+      select: ['id', 'name', 'email'],
+    });
   }
 
   findOne(id: number): Promise<Omit<User, 'password'>> {

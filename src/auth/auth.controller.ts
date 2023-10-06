@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Post,
+  Request,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import RegisterDto from './dto/register.dto';
 import { LocalAuthGuard } from './local.auth.guard';
 import { User } from '../users/entities/user.entity';
@@ -10,6 +18,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @UseInterceptors(ClassSerializerInterceptor)
   async register(@Body() input: RegisterDto) {
     return this.authService.registerUser(input);
   }

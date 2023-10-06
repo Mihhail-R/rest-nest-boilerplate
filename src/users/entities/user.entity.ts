@@ -25,4 +25,8 @@ export class User {
     type: 'varchar',
   })
   password: string;
+
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
 }

@@ -13,11 +13,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
   async create(input: CreateUserDto): Promise<Omit<User, 'password'>> {
-    const user = new User();
-    user.name = input.name;
-    user.email = input.email;
-    user.password = input.password;
-    const newUser = await this.usersRepository.save(user);
+    const newUser = await this.usersRepository.save(new User(input));
     return {
       id: newUser.id,
       name: newUser.name,

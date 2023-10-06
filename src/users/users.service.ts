@@ -12,32 +12,24 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+
   async create(input: CreateUserDto): Promise<Omit<User, 'password'>> {
-    const newUser = await this.usersRepository.save(new User(input));
-    return {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-    };
+    return this.usersRepository.save(new User(input));
   }
 
   findAll(): Promise<Omit<User[], 'password'>> {
-    return this.usersRepository.find({
-      select: ['id', 'name', 'email'],
-    });
+    return this.usersRepository.find();
   }
 
   findOne(id: number): Promise<Omit<User, 'password'>> {
     return this.usersRepository.findOne({
       where: { id },
-      select: ['id', 'name', 'email'],
     });
   }
 
   findByEmail(email: string): Promise<Omit<User, 'password'>> {
     return this.usersRepository.findOne({
       where: { email },
-      select: ['id', 'name', 'email'],
     });
   }
 

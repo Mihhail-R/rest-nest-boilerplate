@@ -9,4 +9,21 @@ export const configuration = () => ({
     autoLoadEntities: true,
     synchronize: process.env.NODE_ENV !== 'production',
   },
+  throttler: [
+    {
+      name: 'short',
+      ttl: parseInt(process.env.SHORT_TERM_LIMITER_DURATION) || 1000,
+      limit: parseInt(process.env.SHORT_TERM_LIMITER) || 10,
+    },
+    {
+      name: 'medium',
+      ttl: parseInt(process.env.MEDIUM_TERM_LIMITER_DURATION) || 10000,
+      limit: parseInt(process.env.MEDIUM_TERM_LIMITER) || 100,
+    },
+    {
+      name: 'long',
+      ttl: parseInt(process.env.LONG_TERM_LIMITER_DURATION) || 60000,
+      limit: parseInt(process.env.LONG_TERM_LIMITER) || 300,
+    },
+  ],
 });

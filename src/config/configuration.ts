@@ -4,7 +4,7 @@ export const configuration = () => ({
     host: process.env.DATABASE_HOST || 'localhost',
     port: parseInt(process.env.DATABASE_PORT, 10) || 3306,
     username: process.env.DATABASE_USER || 'root',
-    password: process.env.DATABASE_PASSWORD || 'root',
+    password: process.env.DATABASE_PASSWORD || '',
     database: process.env.DATABASE_NAME || 'test',
     autoLoadEntities: true,
     synchronize: process.env.NODE_ENV !== 'production',
@@ -26,4 +26,9 @@ export const configuration = () => ({
       limit: parseInt(process.env.LONG_TERM_LIMITER) || 300,
     },
   ],
+  redis: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+    password: process.env.REDIS_PASSWORD || 'root',
+  },
 });
